@@ -1,0 +1,19 @@
+{
+    "voices": [
+        {
+            "name": "Rabeh Ibn Darah AL Jazairi",
+            "votes": 250,
+            "file": "Adhaan Rabeh Ibn Darah Al Jazairi.mp3"
+        },
+        {
+            "name": "Makkah",
+            "votes": 300,
+            "file": "Adhan Makkah.mp3"
+        },
+        {
+            "name": "Madinah",
+            "votes": 200,
+            "file": "Adhan Madina.mp3"
+        }
+    ]
+}
