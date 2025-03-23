@@ -84,20 +84,31 @@ def prayer_monitor(get_current_times, get_audio_file, get_adhaan_enabled):
     logging.info("Starting prayer monitor thread.")
     while True:
         now_dt = datetime.now()
-        now_str = now_dt.strftime("%H:%M")
         current_times = get_current_times()
         for prayer, time_str in current_times.items():
             if prayer not in ("fajr", "dhuhr", "asr", "maghrib", "isha"):
                 continue
-            if now_str == time_str and triggered.get(prayer) != now_str:
-                if get_adhaan_enabled(prayer):
-                    audio_file = get_audio_file()
-                    if audio_file:
-                        play_adhaan(audio_file)
-                    else:
-                        logging.warning("No Adhaan audio file selected.")
-                triggered[prayer] = now_str
-        time.sleep(10)
+            try:
+                # Create a datetime object for today's scheduled time
+                scheduled_dt = datetime.strptime(time_str, "%H:%M").replace(
+                    year=now_dt.year, month=now_dt.month, day=now_dt.day
+                )
+            except Exception as e:
+                logging.error(f"Error parsing scheduled time for {prayer}: {e}")
+                continue
+
+            # Check if the current time is within a 10-second window of the scheduled time
+            if scheduled_dt <= now_dt < scheduled_dt + timedelta(seconds=10):
+                # Only trigger if this scheduled time hasn't been handled yet
+                if triggered.get(prayer) != scheduled_dt:
+                    if get_adhaan_enabled(prayer):
+                        audio_file = get_audio_file()
+                        if audio_file:
+                            play_adhaan(audio_file)
+                        else:
+                            logging.warning("No Adhaan audio file selected.")
+                    triggered[prayer] = scheduled_dt
+        time.sleep(5)
 
 
 class AdhaanApp(QWidget):
